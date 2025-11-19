@@ -12,14 +12,14 @@ CREATE TABLE Passenger (					-- bảng Passenger để lấy thông tin nè
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS Flight (						-- bảng thông tin bay các kiểu 
+CREATE TABLE Flight (						-- bảng thông tin bay các kiểu 
   flight_id VARCHAR(10) NOT NULL PRIMARY KEY,
   airline_name VARCHAR(100),
   departure_airport VARCHAR(100),
   arrival_airport VARCHAR(100),
   departure_time DATETIME,
   arrival_time DATETIME,
-  ticket_price DECIMAL(10,2) CHECK (ticket_price >= 0)
+  ticket_price DECIMAL(10,2)
 );
 
 CREATE TABLE Booking (							-- bảng booking chuyến bay cho khách hàng
@@ -145,49 +145,5 @@ SELECT b.passenger_id, p.passenger_full_name, b.flight_id, b.booking_status
 FROM Booking b
 JOIN Passenger p ON b.passenger_id = p.passenger_id
 WHERE b.booking_status = 'Cancelled';
-
-SELECT booking_id, passenger_id, flight_id, ticket_quantity
-FROM Booking
-WHERE booking_status = 'Confirmed'
-ORDER BY ticket_quantity DESC;
-
-SELECT b.booking_id, p.passenger_full_name, b.flight_id, b.ticket_quantity
-FROM Booking b
-JOIN Passenger p ON b.passenger_id = p.passenger_id
-WHERE b.ticket_quantity BETWEEN 2 AND 3
-ORDER BY p.passenger_full_name ASC;
-
-SELECT b.passenger_id, p.passenger_full_name, b.ticket_quantity
-FROM Booking b
-JOIN Passenger p ON b.passenger_id = p.passenger_id
-JOIN Payment pay ON pay.booking_id = b.booking_id
-WHERE b.ticket_quantity >= 2
-  AND pay.payment_status = 'Pending';
-
-SELECT DISTINCT p.passenger_id, p.passenger_full_name, pay.payment_amount
-FROM Payment pay
-JOIN Booking b ON pay.booking_id = b.booking_id
-JOIN Passenger p ON b.passenger_id = p.passenger_id
-WHERE pay.payment_status = 'Success';
-
-SELECT b.passenger_id, p.passenger_full_name, b.ticket_quantity, b.booking_status
-FROM Booking b
-JOIN Passenger p ON b.passenger_id = p.passenger_id
-WHERE b.ticket_quantity > 1
-ORDER BY b.ticket_quantity DESC
-LIMIT 5;
-
-SELECT f.flight_id, f.airline_name, SUM(b.ticket_quantity) AS total_tickets_booked
-FROM Flight f
-JOIN Booking b ON f.flight_id = b.flight_id
-GROUP BY f.flight_id, f.airline_name
-ORDER BY total_tickets_booked DESC;
-
-SELECT p.passenger_full_name, pay.payment_amount, pay.payment_status
-FROM Passenger p
-JOIN Booking b ON p.passenger_id = b.passenger_id
-JOIN Payment pay ON pay.booking_id = b.booking_id
-WHERE p.passenger_bod < '2000-01-01'
-ORDER BY p.passenger_full_name ASC;
 
 -- (p. b. f.) ở đây được sử dụng là bí danh
